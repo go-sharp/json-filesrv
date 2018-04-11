@@ -12,7 +12,6 @@ import (
 )
 
 func main() {
-	fmt.Println("Hello World")
 	var port string
 	flag.StringVar(&port, "p", ":8000", "port on which the server will listen")
 
