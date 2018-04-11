@@ -18,6 +18,8 @@ func main() {
 
 	flag.Parse()
 
+	cache := map[string][]byte{}
+
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 		log.Println("requesting URL ", r.URL.String())
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -26,6 +28,13 @@ func main() {
 		if len(fname) == 0 {
 			w.WriteHeader(http.StatusBadRequest)
 			fmt.Fprintf(w, "Invalid URL %v", fname)
+			return
+		}
+
+		if data, ok := cache[fname]; ok {
+			log.Printf("found file %v in cache", fname)
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(data)
 			return
 		}
 
@@ -45,6 +54,7 @@ func main() {
 		}
 
 		res, _ := json.Marshal(data)
+		cache[fname] = res
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(res)
 	}
